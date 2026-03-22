@@ -5,7 +5,7 @@
 This is a system that allows you to trigger an agent with the command @agent, which can then search, edit and commit your code, as well as post comments on your GitLab MR or issue.
 The agent runs securely in your pipeline runner.
 
-> This project was forked from [RealMikeChong](https://github.com/RealMikeChong/claude-code-for-gitlab). I used his gitlab webhook app and refactored the runner, added more documentation and added MCP & Opencode Support...
+> This project was forked from [RealMikeChong](https://github.com/RealMikeChong/claude-code-for-gitlab). I used his gitlab webhook app and refactored the runner, added more documentation and added MCP & Claude Code support...
 
 ## Features
 
@@ -40,7 +40,7 @@ Add the **Comments** trigger for the webhook.
 ### GitLab Pipeline
 
 The agent will run in the GitLab CI/CD environment. This is ideal because that way we already have an isolated environment with all necessary tools and permissions.  
-For that, we use the `agent-image` Docker image. This provides the agent with the required dependencies for `C#` and `Node.js`, and the opencode CLI for multi-provider LLMs. You can easily customize the base image in `agent-image/Dockerfile`.
+For that, we use the `agent-image` Docker image. This provides the agent with the required dependencies for `C#` and `Node.js`, and the Claude Code CLI for running Claude AI models. You can easily customize the base image in `agent-image/Dockerfile`.
 
 #### Build Agent Image
 
@@ -50,7 +50,7 @@ The agent image in `agent-image/` serves as the reusable base for CI jobs that r
   - .NET SDK version: 8 (can be changed)
   - Node.js version: 24.x (can also be changed)
   - Source and available tags: <https://github.com/DotNet-Docker-Images/dotnet-nodejs-docker>
-- Includes git, curl, jq, opencode CLI, and the modular runner (`ai-runner`).
+- Includes git, curl, jq, Claude Code CLI, and the modular runner (`ai-runner`).
 
 Build and publish the image to your registry of choice, or use the prebuilt one and reference it in CI via the `AI_AGENT_IMAGE` variable.
 
@@ -62,18 +62,9 @@ Then set in your GitLab CI/CD variables:
 
 You will need to add the following CI/CD variables in your GitLab project (Settings → CI/CD → Variables):
 
-- Provider API key(s) depending on which model you want to use via opencode. Common ones:
-  - `OPENAI_API_KEY`
-  - `ANTHROPIC_API_KEY`
-  - `OPENROUTER_API_KEY`
-  - `GROQ_API_KEY`
-  - `TOGETHER_API_KEY`
-  - `DEEPSEEK_API_KEY`
-  - `FIREWORKS_API_KEY`
-  - `CEREBRAS_API_KEY`
-  - `Z_API_KEY`
-  - Or Azure OpenAI envs: `AZURE_API_KEY`, `AZURE_RESOURCE_NAME`: Your Azure OpenAI resource name (e.g., `my-azure-openai`). `OPENCODE_MODEL` then needs to be `azure/{Deployment Name}`.
-  - Or Bedrock envs: `AWS_ACCESS_KEY_ID` (or `AWS_PROFILE` / `AWS_BEARER_TOKEN_BEDROCK`)
+- Authentication — set **one** of:
+  - `ANTHROPIC_API_KEY`: Your Anthropic API key (API key auth)
+  - `CLAUDE_OAUTH_TOKEN`: Your Claude.ai OAuth token (Pro/Max subscription OAuth auth)
 
 - `GITLAB_TOKEN`: Your GitLab Personal Access Token (with `api`, `read_repository`, `write_repository` permissions)
 
@@ -128,7 +119,7 @@ Run the following steps in the `gitlab-app` directory:
 - `GITLAB_URL`: GitLab instance URL (default: [https://gitlab.com](https://gitlab.com), e.g. [https://gitlab.company.com](https://gitlab.company.com))
 - `WEBHOOK_SECRET`: Secret that you set in you Gitlab Webhook configuration
 - `ADMIN_TOKEN`: Optional admin token for `/admin` endpoints
-- `OPENCODE_AGENT_PROMPT`: The custom base prompt for the AI agent. (This appends to the Opencode system prompt and prepends the custom pipeline additions if set)
+- `CLAUDE_AGENT_PROMPT`: The custom base prompt for the AI agent. (This prepends to the custom pipeline additions if set)
 
 - `GITLAB_TOKEN`: Personal access token with `api` scope
 - `AI_GITLAB_USERNAME`: The GitLab username for the AI user (of the account the Gitlab Token is from)
@@ -138,7 +129,7 @@ Run the following steps in the `gitlab-app` directory:
 - `CANCEL_OLD_PIPELINES`: Cancel older pending pipelines (default: true)
 - `TRIGGER_PHRASE`: Custom trigger phrase instead of `@ai` (default: `@ai`)
 - `BRANCH_PREFIX`: Prefix for branches created by AI (default: `ai`)
-- `OPENCODE_MODEL`: The model used by opencode in `provider/model` (for azure its the deployment name) form (e.g., `azure/gpt-4.1`)
+- `CLAUDE_MODEL`: The Claude model to use (e.g., `claude-sonnet-4-5`, `claude-opus-4-5`)
   
 - `RATE_LIMITING_ENABLED`: Enable/disable rate limiting (default: true). If set to `false`, Redis is not used and not required.
 - `REDIS_URL`: Redis connection URL
@@ -154,13 +145,13 @@ When a pipeline is triggered, these variables are available:
 
 ### GitLab CI/CD Variables (Keys)
 
-Set the appropriate `provider key(s)` for your chosen `OPENCODE_MODEL` as listed above, plus:
+Set `ANTHROPIC_API_KEY` **or** `CLAUDE_OAUTH_TOKEN` in your GitLab CI/CD variables, plus:
 
 - `GITLAB_TOKEN`: Your GitLab Personal Access Token (with `api`, `read_repository`, `write_repository` permissions)
 
 ### Agent Prompt Configuration & Combination
 
-1. Base Prompt: Set `OPENCODE_AGENT_PROMPT` in the webhook app.
+1. Base Prompt: Set `CLAUDE_AGENT_PROMPT` in the webhook app.
 2. Pipeline Additions (optional): Define a `CUSTOM_AGENT_PROMPT` variable directly in `.gitlab-ci.yml` or via CI/CD variables. If present, it will be appended to the base prompt.
 3. Combination: When both exist they are merged.
 
