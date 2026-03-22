@@ -1,5 +1,9 @@
 export function validateProviderKeys() {
-  return !!(process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_OAUTH_TOKEN);
+  return !!(
+    process.env.ANTHROPIC_API_KEY ||
+    process.env.CLAUDE_OAUTH_TOKEN ||
+    process.env.CLAUDE_CODE_OAUTH_TOKEN
+  );
 }
 
 export function validateConfig(context) {
