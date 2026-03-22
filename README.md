@@ -62,7 +62,9 @@ Then set in your GitLab CI/CD variables:
 
 You will need to add the following CI/CD variables in your GitLab project (Settings → CI/CD → Variables):
 
-- `ANTHROPIC_API_KEY`: Your Anthropic API key for Claude models
+- Authentication — set **one** of:
+  - `ANTHROPIC_API_KEY`: Your Anthropic API key (API key auth)
+  - `CLAUDE_OAUTH_TOKEN`: Your Claude.ai OAuth token (Pro/Max subscription OAuth auth)
 
 - `GITLAB_TOKEN`: Your GitLab Personal Access Token (with `api`, `read_repository`, `write_repository` permissions)
 
@@ -143,7 +145,7 @@ When a pipeline is triggered, these variables are available:
 
 ### GitLab CI/CD Variables (Keys)
 
-Set `ANTHROPIC_API_KEY` in your GitLab CI/CD variables, plus:
+Set `ANTHROPIC_API_KEY` **or** `CLAUDE_OAUTH_TOKEN` in your GitLab CI/CD variables, plus:
 
 - `GITLAB_TOKEN`: Your GitLab Personal Access Token (with `api`, `read_repository`, `write_repository` permissions)
 

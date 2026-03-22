@@ -35,7 +35,7 @@ export async function run() {
     const hasAnyProviderKey = validateProviderKeys();
     if (!hasAnyProviderKey) {
       logger.warn(
-        "No ANTHROPIC_API_KEY detected in env. claude CLI will fail without a valid API key.",
+        "No ANTHROPIC_API_KEY or CLAUDE_OAUTH_TOKEN detected in env. claude CLI will fail without valid credentials.",
       );
     }
 

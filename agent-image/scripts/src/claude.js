@@ -28,8 +28,16 @@ export async function runClaude(context, prompt) {
 
   logger.info(`Running: claude ${cliArgs.join(" ")}`);
 
+  // Build a clean env: forward CLAUDE_OAUTH_TOKEN as CLAUDE_CODE_OAUTH_TOKEN
+  // (the name the claude CLI actually reads for OAuth auth).
+  const env = { ...process.env };
+  if (env.CLAUDE_OAUTH_TOKEN) {
+    env.CLAUDE_CODE_OAUTH_TOKEN = env.CLAUDE_OAUTH_TOKEN;
+  }
+
   const result = spawnSync("claude", cliArgs, {
     encoding: "utf-8",
+    env,
     stdio: ["inherit", process.stdout, process.stderr],
   });
 
