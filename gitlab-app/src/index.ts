@@ -334,4 +334,5 @@ logger.info(`GitLab AI Webhook Server starting on port ${port}`);
 export default {
   port,
   fetch: app.fetch,
+  hostname: "0.0.0.0"
 };
