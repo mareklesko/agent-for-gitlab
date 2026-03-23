@@ -17,7 +17,7 @@ export async function runClaude(context, prompt) {
   const cliArgs = [
     "--print",
     "--allowedTools",
-    "'mcp__*,Bash(git push *),Bash(glab mr create *),Bash(glab mr note *),Bash(curl *),WebFetch(domain:gitlab.lesko.me)'"
+    "'mcp__*,Bash(git push *),Bash(glab mr create *),Bash(glab mr note *),Bash(curl *),WebFetch(domain:gitlab.lesko.me)'",
     "--model",
     context.claudeModel,
   ];
