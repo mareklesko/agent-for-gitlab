@@ -23,7 +23,7 @@ export async function runClaude(context, prompt) {
   ];
 
   if (context.agentPrompt) {
-     cliArgs.push("--system-prompt", context.agentPrompt);
+     cliArgs.push("--append-system-prompt", context.agentPrompt);
   }
 
   // Pass the prompt via stdin to avoid leaking content in logs and
