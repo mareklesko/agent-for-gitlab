@@ -7,6 +7,6 @@ export function writeOutput(success, data = {}) {
     ...data,
   };
 
-  writeFileSync("/opt/agent/ai-output.json", JSON.stringify(output, null, 2));
+  writeFileSync("ai-output.json", JSON.stringify(output, null, 2));
   return output;
 }
